@@ -1,14 +1,13 @@
 {
+  "name": "Kingdomly Citizens",
+  "description": "Kingdomly Citizens are the most powerful warriors in the Kingdomly world. They are the only ones who can defeat the evil forces of the Dark Lord.",
   "projectId": "ElccES0GGHrJyiZT2TTv",
   "editions": [
     {
-      "name": "Kingdomly Knights",
-      "description": "Kingdomly Knights are the most powerful warriors in the Kingdomly world. They are the only ones who can defeat the evil forces of the Dark Lord.",
-
-      "quantity": 100,
+      "name": "Knights",
       "layers": [
         {
-          "name": "body",
+          "name": "knight_body",
           "attributes": [
             {
               "name": "red knight.png",
@@ -38,7 +37,7 @@
           ]
         },
         {
-          "name": "head",
+          "name": "knight_head",
           "attributes": [
             {
               "name": "Cowl.png",
@@ -68,7 +67,7 @@
           ]
         },
         {
-          "name": "weapon",
+          "name": "knight_weapon",
           "attributes": [
             {
               "name": "shield.png",
@@ -95,27 +94,15 @@
               "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fa90df309-a092-45e7-8b8b-16763bf4fc82-axe.png?alt=media&token=67f3d368-4a51-4802-a3db-3950474acdaa",
               "rarity": 20
             }
-          ]
-        }
-      ],
-      "layerConfigurations": [
-        {
-          "growEditionSizeTo": 100,
-          "layersOrder": [
-            { "name": "body" },
-            { "name": "head" },
-            { "name": "weapon" }
           ]
         }
       ]
     },
     {
-      "name": "Kingdomly Wizards",
-      "description": "Kingdomly Wizards are the most powerful wizards in the world",
-      "quantity": 20,
+      "name": "Wizards",
       "layers": [
         {
-          "name": "body",
+          "name": "wizard_body",
           "attributes": [
             {
               "name": "red knight.png",
@@ -145,7 +132,7 @@
           ]
         },
         {
-          "name": "head",
+          "name": "wizard_head",
           "attributes": [
             {
               "name": "Cowl.png",
@@ -175,7 +162,7 @@
           ]
         },
         {
-          "name": "weapon",
+          "name": "wizard_weapon",
           "attributes": [
             {
               "name": "shield.png",
@@ -204,16 +191,26 @@
             }
           ]
         }
-      ],
-      "layerConfigurations": [
-        {
-          "growEditionSizeTo": 25,
-          "layersOrder": [
-            { "name": "body" },
-            { "name": "head" },
-            { "name": "weapon" }
-          ]
-        }
+      ]
+    }
+  ],
+  "layerConfigurations": [
+    {
+      "growEditionSizeTo": 100,
+      "editionName": "Knights",
+      "layersOrder": [
+        { "name": "knight_body" },
+        { "name": "knight_head" },
+        { "name": "knight_weapon" }
+      ]
+    },
+    {
+      "growEditionSizeTo": 125,
+      "editionName": "Wizards",
+      "layersOrder": [
+        { "name": "wizard_weapon" },
+        { "name": "wizard_body" },
+        { "name": "wizard_head" }
       ]
     }
   ]

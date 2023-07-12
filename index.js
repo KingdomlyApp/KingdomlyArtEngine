@@ -1,5 +1,6 @@
 const express = require("express");
 const json = express.json;
+const path = require("path");
 
 const Router = require("./routes.js");
 
@@ -15,6 +16,9 @@ app.use(function (req, res, next) {
   );
   next();
 });
+
+// Serve static files from the "public" directory
+app.use("/build", express.static(path.join(__dirname, "build")));
 
 const PORT = process.env.PORT || 3001;
 app.use("/", Router);

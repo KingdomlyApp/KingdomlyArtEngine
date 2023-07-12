@@ -10,9 +10,12 @@ let hashlipsGiffer = null;
 class ArtEngine {
   constructor({ projectId, edition, config }) {
     this.buildDir = `${basePath}/build/${projectId}`;
-    this.layersDir = `${basePath}/layers/${projectId}/${edition}`;
+    this.layersDir = `${basePath}/layers/${projectId}`;
     this.config = Object.assign(this, config);
-    this.canvas = createCanvas(this.config.width, this.config.height);
+    this.canvas = createCanvas(
+      this.config.format.width,
+      this.config.format.height
+    );
     this.ctx = this.canvas.getContext("2d");
     this.ctx.imageSmoothingEnabled = this.config.smoothing;
     this.metadataList = [];
@@ -24,10 +27,9 @@ class ArtEngine {
     if (fs.existsSync(this.buildDir)) {
       fs.rmdirSync(this.buildDir, { recursive: true });
     }
-    fs.mkdirSync(this.buildDir);
+    fs.mkdirSync(this.buildDir, { recursive: true });
     fs.mkdirSync(`${this.buildDir}/json`);
     fs.mkdirSync(`${this.buildDir}/images`);
-    console.log(this.config);
     if (this.config.gif.export) {
       fs.mkdirSync(`${this.buildDir}/gifs`);
     }
@@ -78,10 +80,12 @@ class ArtEngine {
       });
   };
 
-  layersSetup = (layersOrder) => {
-    const layers = layersOrder.map((layerObj, index) => ({
+  layersSetup = (_layerSetup) => {
+    const layers = _layerSetup.layersOrder.map((layerObj, index) => ({
       id: index,
-      elements: this.getElements(`${this.layersDir}/${layerObj.name}/`),
+      elements: this.getElements(
+        `${this.layersDir}/${_layerSetup.editionName}/${layerObj.name}/`
+      ),
       name:
         layerObj.options?.["displayName"] != undefined
           ? layerObj.options?.["displayName"]
@@ -119,7 +123,12 @@ class ArtEngine {
     this.ctx.fillStyle = this.config.background.static
       ? this.config.background.default
       : this.genColor();
-    this.ctx.fillRect(0, 0, this.config.width, this.config.height);
+    this.ctx.fillRect(
+      0,
+      0,
+      this.config.format.width,
+      this.config.format.height
+    );
   };
 
   addMetadata = (_dna, _edition) => {
@@ -128,9 +137,9 @@ class ArtEngine {
       name: `${this.config.namePrefix} #${_edition}`,
       description: this.config.description,
       image: `${this.config.baseUri}/${_edition}.png`,
+      date: dateTime,
       dna: sha1(_dna),
       edition: _edition,
-      date: dateTime,
       ...this.config.extraMetadata,
       attributes: this.attributesList,
     };
@@ -180,8 +189,8 @@ class ArtEngine {
           _renderObject.loadedImage,
           0,
           0,
-          this.config.width,
-          this.config.height
+          this.config.format.width,
+          this.config.format.height
         );
 
     this.addAttributes(_renderObject);
@@ -189,9 +198,9 @@ class ArtEngine {
 
   constructLayerToDna = (_dna = "", _layers = []) => {
     let mappedDnaToLayers = _layers.map((layer, index) => {
-      let selectedElement = layer.elements.find(
-        cleanDna(_dna.split(DNA_DELIMITER)[index])
-      );
+      let selectedElement = layer.elements.find((el) => {
+        return el.id == this.cleanDna(_dna.split(DNA_DELIMITER)[index]);
+      });
       return {
         name: layer.name,
         blend: layer.blend,
@@ -210,7 +219,7 @@ class ArtEngine {
    * @param {String} _dna New DNA string
    * @returns new DNA string with any items that should be filtered, removed.
    */
- filterDNAOptions = (_dna) => {
+  filterDNAOptions = (_dna) => {
     const dnaItems = _dna.split(DNA_DELIMITER);
     const filteredDNA = dnaItems.filter((element) => {
       const query = /(\?.*$)/;
@@ -275,7 +284,7 @@ class ArtEngine {
     fs.writeFileSync(`${this.buildDir}/json/_metadata.json`, _data);
   };
 
- saveMetaDataSingleFile = (_editionCount) => {
+  saveMetaDataSingleFile = (_editionCount) => {
     let metadata = this.metadataList.find(
       (meta) => meta.edition == _editionCount
     );
@@ -328,7 +337,7 @@ class ArtEngine {
         : null;
       while (layerConfigIndex < this.config.layerConfigurations.length) {
         const layers = this.layersSetup(
-          this.config.layerConfigurations[layerConfigIndex].layersOrder
+          this.config.layerConfigurations[layerConfigIndex]
         );
         while (
           editionCount <=
@@ -338,14 +347,18 @@ class ArtEngine {
           if (this.isDnaUnique(this.dnaList, newDna)) {
             let results = this.constructLayerToDna(newDna, layers);
             let loadedElements = [];
-
             results.forEach((layer) => {
               loadedElements.push(this.loadLayerImg(layer));
             });
 
             await Promise.all(loadedElements).then((renderObjectArray) => {
               this.config.debugLogs ? console.log("Clearing canvas") : null;
-              this.ctx.clearRect(0, 0, this.config.width, this.config.height);
+              this.ctx.clearRect(
+                0,
+                0,
+                this.config.format.width,
+                this.config.format.height
+              );
               if (this.config.gif.export) {
                 hashlipsGiffer = new HashlipsGiffer(
                   this.canvas,
