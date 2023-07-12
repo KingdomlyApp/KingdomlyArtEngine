@@ -13,7 +13,7 @@ class Configuration {
 
   // Getters
   getConfig() {
-    return new Configuration({
+    return {
       //User set variables
       network: "eth", // Defaulted for now
       namePrefix: this.namePrefix, // Prefix for the name of every token
@@ -64,7 +64,7 @@ class Configuration {
         delay: 500,
         imageName: "preview.gif",
       },
-    });
+    };
   }
 }
 

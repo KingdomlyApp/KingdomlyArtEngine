@@ -59,14 +59,18 @@ async function GenerateCollection(req, res) {
     const configObject = new Configuration({
       editionName,
       editionDesc,
-      editionLayerConfig,
+      layerConfigurations: editionLayerConfig,
       extraMetadata: {},
     });
-    configObject.setLayerConfigurations(edition.layers);
+
     const configFile = configObject.getConfig();
 
     //Step 4: Fire up the main script
-    const artEngine = new ArtEngine({ projectId, editionName, configFile });
+    const artEngine = new ArtEngine({
+      projectId,
+      edition: editionName,
+      config: configFile,
+    });
     try {
       artEngine.buildSetup();
       artEngine.startCreating();

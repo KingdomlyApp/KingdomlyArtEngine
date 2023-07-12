@@ -8,34 +8,35 @@ const HashlipsGiffer = require(`${basePath}/modules/HashlipsGiffer.js`);
 let hashlipsGiffer = null;
 
 class ArtEngine {
-  constructor(projectId, edition, config) {
+  constructor({ projectId, edition, config }) {
     this.buildDir = `${basePath}/build/${projectId}`;
     this.layersDir = `${basePath}/layers/${projectId}/${edition}`;
-    Object.assign(this, config);
-    this.canvas = createCanvas(this.format.width, this.format.height);
+    this.config = Object.assign(this, config);
+    this.canvas = createCanvas(this.config.width, this.config.height);
     this.ctx = this.canvas.getContext("2d");
-    this.ctx.imageSmoothingEnabled = this.format.smoothing;
+    this.ctx.imageSmoothingEnabled = this.config.smoothing;
     this.metadataList = [];
     this.attributesList = [];
     this.dnaList = new Set();
   }
 
   buildSetup = () => {
-    if (fs.existsSync(buildDir)) {
-      fs.rmdirSync(buildDir, { recursive: true });
+    if (fs.existsSync(this.buildDir)) {
+      fs.rmdirSync(this.buildDir, { recursive: true });
     }
-    fs.mkdirSync(buildDir);
-    fs.mkdirSync(`${buildDir}/json`);
-    fs.mkdirSync(`${buildDir}/images`);
-    if (this.gif.export) {
-      fs.mkdirSync(`${buildDir}/gifs`);
+    fs.mkdirSync(this.buildDir);
+    fs.mkdirSync(`${this.buildDir}/json`);
+    fs.mkdirSync(`${this.buildDir}/images`);
+    console.log(this.config);
+    if (this.config.gif.export) {
+      fs.mkdirSync(`${this.buildDir}/gifs`);
     }
   };
 
   getRarityWeight = (_str) => {
     let nameWithoutExtension = _str.slice(0, -4);
     var nameWithoutWeight = Number(
-      nameWithoutExtension.split(this.rarityDelimiter).pop()
+      nameWithoutExtension.split(this.config.rarityDelimiter).pop()
     );
     if (isNaN(nameWithoutWeight)) {
       nameWithoutWeight = 1;
@@ -44,7 +45,7 @@ class ArtEngine {
   };
 
   cleanDna = (_str) => {
-    const withoutOptions = removeQueryStrings(_str);
+    const withoutOptions = this.removeQueryStrings(_str);
     var dna = Number(withoutOptions.split(":").shift());
     return dna;
   };
@@ -52,7 +53,7 @@ class ArtEngine {
   cleanName = (_str) => {
     let nameWithoutExtension = _str.slice(0, -4);
     var nameWithoutWeight = nameWithoutExtension
-      .split(this.rarityDelimiter)
+      .split(this.config.rarityDelimiter)
       .shift();
     return nameWithoutWeight;
   };
@@ -69,10 +70,10 @@ class ArtEngine {
         }
         return {
           id: index,
-          name: cleanName(i),
+          name: this.cleanName(i),
           filename: i,
           path: `${path}${i}`,
-          weight: getRarityWeight(i),
+          weight: this.getRarityWeight(i),
         };
       });
   };
@@ -80,7 +81,7 @@ class ArtEngine {
   layersSetup = (layersOrder) => {
     const layers = layersOrder.map((layerObj, index) => ({
       id: index,
-      elements: getElements(`${layersDir}/${layerObj.name}/`),
+      elements: this.getElements(`${this.layersDir}/${layerObj.name}/`),
       name:
         layerObj.options?.["displayName"] != undefined
           ? layerObj.options?.["displayName"]
@@ -103,63 +104,37 @@ class ArtEngine {
 
   saveImage = (_editionCount) => {
     fs.writeFileSync(
-      `${buildDir}/images/${_editionCount}.png`,
+      `${this.buildDir}/images/${_editionCount}.png`,
       this.canvas.toBuffer("image/png")
     );
   };
 
   genColor = () => {
     let hue = Math.floor(Math.random() * 360);
-    let pastel = `hsl(${hue}, 100%, ${this.background.brightness})`;
+    let pastel = `hsl(${hue}, 100%, ${this.config.background.brightness})`;
     return pastel;
   };
 
   drawBackground = () => {
-    this.ctx.fillStyle = this.background.static
-      ? this.background.default
-      : genColor();
-    this.ctx.fillRect(0, 0, this.format.width, this.format.height);
+    this.ctx.fillStyle = this.config.background.static
+      ? this.config.background.default
+      : this.genColor();
+    this.ctx.fillRect(0, 0, this.config.width, this.config.height);
   };
 
   addMetadata = (_dna, _edition) => {
     let dateTime = Date.now();
     let tempMetadata = {
-      name: `${this.namePrefix} #${_edition}`,
-      description: this.description,
-      image: `${this.baseUri}/${_edition}.png`,
+      name: `${this.config.namePrefix} #${_edition}`,
+      description: this.config.description,
+      image: `${this.config.baseUri}/${_edition}.png`,
       dna: sha1(_dna),
       edition: _edition,
       date: dateTime,
-      ...this.extraMetadata,
+      ...this.config.extraMetadata,
       attributes: this.attributesList,
-      compiler: "HashLips Art Engine",
     };
-    if (this.network == NETWORK.sol) {
-      tempMetadata = {
-        //Added metadata for solana
-        name: tempMetadata.name,
-        symbol: this.solanaMetadata.symbol,
-        description: tempMetadata.description,
-        //Added metadata for solana
-        seller_fee_basis_points: this.solanaMetadata.seller_fee_basis_points,
-        image: `${_edition}.png`,
-        //Added metadata for solana
-        external_url: this.solanaMetadata.external_url,
-        edition: _edition,
-        ...this.extraMetadata,
-        attributes: tempMetadata.attributes,
-        properties: {
-          files: [
-            {
-              uri: `${_edition}.png`,
-              type: "image/png",
-            },
-          ],
-          category: "image",
-          creators: this.solanaMetadata.creators,
-        },
-      };
-    }
+
     this.metadataList.push(tempMetadata);
     this.attributesList = [];
   };
@@ -184,38 +159,38 @@ class ArtEngine {
   };
 
   addText = (_sig, x, y, size) => {
-    this.ctx.fillStyle = this.text.color;
-    this.ctx.font = `${this.text.weight} ${size}pt ${this.text.family}`;
-    this.ctx.textBaseline = this.text.baseline;
-    this.ctx.textAlign = this.text.align;
+    this.ctx.fillStyle = this.config.text.color;
+    this.ctx.font = `${this.config.text.weight} ${size}pt ${this.config.text.family}`;
+    this.ctx.textBaseline = this.config.text.baseline;
+    this.ctx.textAlign = this.config.text.align;
     this.ctx.fillText(_sig, x, y);
   };
 
   drawElement = (_renderObject, _index, _layersLen) => {
     this.ctx.globalAlpha = _renderObject.layer.opacity;
     this.ctx.globalCompositeOperation = _renderObject.layer.blend;
-    this.text.only
-      ? addText(
-          `${_renderObject.layer.name}${this.text.spacer}${_renderObject.layer.selectedElement.name}`,
-          this.text.xGap,
-          this.text.yGap * (_index + 1),
-          this.text.size
+    this.config.text.only
+      ? this.addText(
+          `${_renderObject.layer.name}${this.config.text.spacer}${_renderObject.layer.selectedElement.name}`,
+          this.config.text.xGap,
+          this.config.text.yGap * (_index + 1),
+          this.config.text.size
         )
       : this.ctx.drawImage(
           _renderObject.loadedImage,
           0,
           0,
-          this.format.width,
-          this.format.height
+          this.config.width,
+          this.config.height
         );
 
-    addAttributes(_renderObject);
+    this.addAttributes(_renderObject);
   };
 
   constructLayerToDna = (_dna = "", _layers = []) => {
     let mappedDnaToLayers = _layers.map((layer, index) => {
       let selectedElement = layer.elements.find(
-        (e) => e.id == cleanDna(_dna.split(DNA_DELIMITER)[index])
+        cleanDna(_dna.split(DNA_DELIMITER)[index])
       );
       return {
         name: layer.name,
@@ -235,7 +210,7 @@ class ArtEngine {
    * @param {String} _dna New DNA string
    * @returns new DNA string with any items that should be filtered, removed.
    */
-  filterDNAOptions = (_dna) => {
+ filterDNAOptions = (_dna) => {
     const dnaItems = _dna.split(DNA_DELIMITER);
     const filteredDNA = dnaItems.filter((element) => {
       const query = /(\?.*$)/;
@@ -268,7 +243,7 @@ class ArtEngine {
   };
 
   isDnaUnique = (_DnaList = new Set(), _dna = "") => {
-    const _filteredDNA = filterDNAOptions(_dna);
+    const _filteredDNA = this.filterDNAOptions(_dna);
     return !_DnaList.has(_filteredDNA);
   };
 
@@ -297,20 +272,20 @@ class ArtEngine {
   };
 
   writeMetaData = (_data) => {
-    fs.writeFileSync(`${buildDir}/json/_metadata.json`, _data);
+    fs.writeFileSync(`${this.buildDir}/json/_metadata.json`, _data);
   };
 
-  saveMetaDataSingleFile = (_editionCount) => {
+ saveMetaDataSingleFile = (_editionCount) => {
     let metadata = this.metadataList.find(
       (meta) => meta.edition == _editionCount
     );
-    this.debugLogs
+    this.config.debugLogs
       ? console.log(
           `Writing metadata for ${_editionCount}: ${JSON.stringify(metadata)}`
         )
       : null;
     fs.writeFileSync(
-      `${buildDir}/json/${_editionCount}.json`,
+      `${this.buildDir}/json/${_editionCount}.json`,
       JSON.stringify(metadata, null, 2)
     );
   };
@@ -336,98 +311,100 @@ class ArtEngine {
       let failedCount = 0;
       let abstractedIndexes = [];
       for (
-        let i = this.network == NETWORK.sol ? 0 : 1;
+        let i = this.config.network == NETWORK.sol ? 0 : 1;
         i <=
-        this.layerConfigurations[this.layerConfigurations.length - 1]
-          .growEditionSizeTo;
+        this.config.layerConfigurations[
+          this.config.layerConfigurations.length - 1
+        ].growEditionSizeTo;
         i++
       ) {
         abstractedIndexes.push(i);
       }
-      if (this.shuffleLayerConfigurations) {
-        abstractedIndexes = shuffle(abstractedIndexes);
+      if (this.config.shuffleLayerConfigurations) {
+        abstractedIndexes = this.shuffle(abstractedIndexes);
       }
-      this.debugLogs
+      this.config.debugLogs
         ? console.log("Editions left to create: ", abstractedIndexes)
         : null;
-      while (layerConfigIndex < this.layerConfigurations.length) {
-        const layers = layersSetup(
-          this.layerConfigurations[layerConfigIndex].layersOrder
+      while (layerConfigIndex < this.config.layerConfigurations.length) {
+        const layers = this.layersSetup(
+          this.config.layerConfigurations[layerConfigIndex].layersOrder
         );
         while (
           editionCount <=
-          this.layerConfigurations[layerConfigIndex].growEditionSizeTo
+          this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         ) {
-          let newDna = createDna(layers);
-          if (isDnaUnique(this.dnaList, newDna)) {
-            let results = constructLayerToDna(newDna, layers);
+          let newDna = this.createDna(layers);
+          if (this.isDnaUnique(this.dnaList, newDna)) {
+            let results = this.constructLayerToDna(newDna, layers);
             let loadedElements = [];
 
             results.forEach((layer) => {
-              loadedElements.push(loadLayerImg(layer));
+              loadedElements.push(this.loadLayerImg(layer));
             });
 
             await Promise.all(loadedElements).then((renderObjectArray) => {
-              this.debugLogs ? console.log("Clearing canvas") : null;
-              this.ctx.clearRect(0, 0, this.format.width, this.format.height);
-              if (this.gif.export) {
+              this.config.debugLogs ? console.log("Clearing canvas") : null;
+              this.ctx.clearRect(0, 0, this.config.width, this.config.height);
+              if (this.config.gif.export) {
                 hashlipsGiffer = new HashlipsGiffer(
                   this.canvas,
                   this.ctx,
                   `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
-                  this.gif.repeat,
-                  this.gif.quality,
-                  this.gif.delay
+                  this.config.gif.repeat,
+                  this.config.gif.quality,
+                  this.config.gif.delay
                 );
                 hashlipsGiffer.start();
               }
-              if (this.background.generate) {
-                drawBackground();
+              if (this.config.background.generate) {
+                this.drawBackground();
               }
               renderObjectArray.forEach((renderObject, index) => {
-                drawElement(
+                this.drawElement(
                   renderObject,
                   index,
-                  this.layerConfigurations[layerConfigIndex].layersOrder.length
+                  this.config.layerConfigurations[layerConfigIndex].layersOrder
+                    .length
                 );
-                if (this.gif.export) {
+                if (this.config.gif.export) {
                   hashlipsGiffer.add();
                 }
               });
-              if (this.gif.export) {
+              if (this.config.gif.export) {
                 hashlipsGiffer.stop();
               }
-              this.debugLogs
+              this.config.debugLogs
                 ? console.log("Editions left to create: ", abstractedIndexes)
                 : null;
-              saveImage(abstractedIndexes[0]);
-              addMetadata(newDna, abstractedIndexes[0]);
-              saveMetaDataSingleFile(abstractedIndexes[0]);
+              this.saveImage(abstractedIndexes[0]);
+              this.addMetadata(newDna, abstractedIndexes[0]);
+              this.saveMetaDataSingleFile(abstractedIndexes[0]);
               console.log(
                 `Created edition: ${abstractedIndexes[0]}, with DNA: ${sha1(
                   newDna
                 )}`
               );
             });
-            this.dnaList.add(filterDNAOptions(newDna));
+            this.dnaList.add(this.filterDNAOptions(newDna));
             editionCount++;
             abstractedIndexes.shift();
           } else {
             console.log("DNA exists!");
             failedCount++;
-            if (failedCount >= this.uniqueDnaTorrance) {
+            if (failedCount >= this.config.uniqueDnaTorrance) {
               console.log(
-                `You need more layers or elements to grow your edition to ${this.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
+                `You need more layers or elements to grow your edition to ${this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
               );
               throw new Error(
-                `You need more layers or elements to grow your edition to ${this.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
+                `You need more layers or elements to grow your edition to ${this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
               );
             }
           }
         }
         layerConfigIndex++;
       }
-      writeMetaData(JSON.stringify(this.metadataList, null, 2));
+      this.writeMetaData(JSON.stringify(this.metadataList, null, 2));
       return "Creation successful";
     } catch (error) {
       // Here you could log the error, or even re-throw it if you want it to be handled further up:
