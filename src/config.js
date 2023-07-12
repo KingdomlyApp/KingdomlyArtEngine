@@ -1,122 +1,71 @@
-const basePath = process.cwd();
-const { MODE } = require(`${basePath}/constants/blend_mode.js`);
-const { NETWORK } = require(`${basePath}/constants/network.js`);
+class Configuration {
+  constructor({
+    editionName,
+    editionDesc,
+    layerConfigurations,
+    extraMetadata,
+  }) {
+    this.namePrefix = editionName;
+    this.description = editionDesc;
+    this.extraMetadata = extraMetadata;
+    this.layerConfigurations = layerConfigurations;
+  }
 
-const network = NETWORK.eth;
+  // Getters
+  getConfig() {
+    return new Configuration({
+      //User set variables
+      network: "eth", // Defaulted for now
+      namePrefix: this.namePrefix, // Prefix for the name of every token
+      description: this.description, // Description for every token
+      baseUri: "ipfs://NewUriToReplace",
+      solanaMetadata: {}, // Not required atm
+      layerConfigurations: this.layerConfigurations, // An array of layer configurations
+      extraMetadata: this.extraMetadata, // An object of metadata that the user wants to add
 
-// General metadata for Ethereum
-const namePrefix = "Your Collection";
-const description = "Remember to replace this description";
-const baseUri = "ipfs://NewUriToReplace";
+      //Everything below is default
+      shuffleLayerConfigurations: false,
+      debugLogs: false,
+      format: { width: 512, height: 512, smoothing: false },
+      gif: { export: false, repeat: 0, quality: 100, delay: 500 },
+      text: {
+        only: false,
+        color: "#ffffff",
+        size: 20,
+        xGap: 40,
+        yGap: 40,
+        align: "left",
+        baseline: "top",
+        weight: "regular",
+        family: "Courier",
+        spacer: " => ",
+      },
+      pixelFormat: { ratio: 2 / 128 },
+      background: {
+        generate: false,
+        brightness: "80%",
+        static: false,
+        default: "#000000",
+      },
 
-const solanaMetadata = {
-  symbol: "YC",
-  seller_fee_basis_points: 1000, // Define how much % you want from secondary market sales 1000 = 10%
-  external_url: "https://www.youtube.com/c/hashlipsnft",
-  creators: [
-    {
-      address: "7fXNuer5sbZtaTEPhtJ5g5gNtuyRoKkvxdjEjEnPN4mC",
-      share: 100,
-    },
-  ],
-};
+      rarityDelimiter: "#",
+      uniqueDnaTorrance: 10000,
+      preview: {
+        thumbPerRow: 5,
+        thumbWidth: 50,
+        imageRatio: 512 / 512,
+        imageName: "preview.png",
+      },
+      preview_gif: {
+        numberOfImages: 5,
+        order: "ASC",
+        repeat: 0,
+        quality: 100,
+        delay: 500,
+        imageName: "preview.gif",
+      },
+    });
+  }
+}
 
-// If you have selected Solana then the collection starts from 0 automatically
-const layerConfigurations = [
-  {
-    growEditionSizeTo: 5,
-    layersOrder: [
-      { name: "Background" },
-      { name: "Eyeball" },
-      { name: "Eye color" },
-      { name: "Iris" },
-      { name: "Shine" },
-      { name: "Bottom lid" },
-      { name: "Top lid" },
-    ],
-  },
-];
-
-const shuffleLayerConfigurations = false;
-
-const debugLogs = false;
-
-const format = {
-  width: 512,
-  height: 512,
-  smoothing: false,
-};
-
-const gif = {
-  export: false,
-  repeat: 0,
-  quality: 100,
-  delay: 500,
-};
-
-const text = {
-  only: false,
-  color: "#ffffff",
-  size: 20,
-  xGap: 40,
-  yGap: 40,
-  align: "left",
-  baseline: "top",
-  weight: "regular",
-  family: "Courier",
-  spacer: " => ",
-};
-
-const pixelFormat = {
-  ratio: 2 / 128,
-};
-
-const background = {
-  generate: true,
-  brightness: "80%",
-  static: false,
-  default: "#000000",
-};
-
-const extraMetadata = {};
-
-const rarityDelimiter = "#";
-
-const uniqueDnaTorrance = 10000;
-
-const preview = {
-  thumbPerRow: 5,
-  thumbWidth: 50,
-  imageRatio: format.height / format.width,
-  imageName: "preview.png",
-};
-
-const preview_gif = {
-  numberOfImages: 5,
-  order: "ASC", // ASC, DESC, MIXED
-  repeat: 0,
-  quality: 100,
-  delay: 500,
-  imageName: "preview.gif",
-};
-
-module.exports = {
-  format,
-  baseUri,
-  description,
-  background,
-  uniqueDnaTorrance,
-  layerConfigurations,
-  rarityDelimiter,
-  preview,
-  shuffleLayerConfigurations,
-  debugLogs,
-  extraMetadata,
-  pixelFormat,
-  text,
-  namePrefix,
-  network,
-  solanaMetadata,
-  gif,
-  preview_gif,
-};
+module.exports = Configuration;

@@ -1,0 +1,220 @@
+{
+  "projectId": "ElccES0GGHrJyiZT2TTv",
+  "editions": [
+    {
+      "name": "Kingdomly Knights",
+      "description": "Kingdomly Knights are the most powerful warriors in the Kingdomly world. They are the only ones who can defeat the evil forces of the Dark Lord.",
+
+      "quantity": 100,
+      "layers": [
+        {
+          "name": "body",
+          "attributes": [
+            {
+              "name": "red knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F99eac24b-5f7b-49e8-b12f-56a067e0169e-red%20knight.PNG?alt=media&token=93f009af-e6e1-4aba-8515-dca73288654e",
+              "rarity": 20
+            },
+            {
+              "name": "astrobody.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F8bed7d76-bf7a-4ca5-9706-a61b0ddefc6b-astrobody.PNG?alt=media&token=a59132bc-64f3-483d-aca2-ed3974973719",
+              "rarity": 20
+            },
+            {
+              "name": "silver knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F73b960b7-dc94-47b4-9274-1bfd23aa47ed-silver%20knight.PNG?alt=media&token=64106502-5dc2-489e-a4c7-009dd74d7df0",
+              "rarity": 20
+            },
+            {
+              "name": "white knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F60e6f99f-4109-4411-b45b-65c39af5693c-white%20knight.PNG?alt=media&token=7b262b3c-e869-4eb2-bc72-8d546b734973",
+              "rarity": 20
+            },
+            {
+              "name": "dark knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F46096649-3936-4961-b12b-8ca896e148b2-dark%20knight.PNG?alt=media&token=d77c4321-815d-413f-a315-11d561c53096",
+              "rarity": 20
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "attributes": [
+            {
+              "name": "Cowl.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F3dccd5a3-6a46-4eb9-b0ed-a16e757b0415-Cowl.PNG?alt=media&token=749289cc-1df8-4416-818f-d521f692a1fa",
+              "rarity": 20
+            },
+            {
+              "name": "astrohead.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F2425543e-f925-4c50-95c3-c1b4a82443f6-Astrohead.PNG?alt=media&token=47e0052c-07e6-43e8-9775-b80fa1acfd60",
+              "rarity": 20
+            },
+            {
+              "name": "closed helm.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F607531f7-c597-444f-a87f-94110923e5bb-Closed%20Helm.png?alt=media&token=aa78e802-5222-41bd-b583-d609f92dbaed",
+              "rarity": 20
+            },
+            {
+              "name": "cowboy.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fb9706148-02f6-4a4d-9893-82b765cd9c50-Cowboy.PNG?alt=media&token=37bd05ee-efaf-47a4-a50a-a4ed590de4bc",
+              "rarity": 20
+            },
+            {
+              "name": "open helm.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fa7f8fcf0-3dd1-46b5-ad09-9bdc96d7df28-Open%20Helm.png?alt=media&token=078ec04c-c01d-432f-b94c-3e8e175b7426",
+              "rarity": 20
+            }
+          ]
+        },
+        {
+          "name": "weapon",
+          "attributes": [
+            {
+              "name": "shield.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F523f7733-22d1-4714-915b-f9a4e42d094a-shield.png?alt=media&token=7ff9769a-3845-4330-a909-45b4097221f7",
+              "rarity": 20
+            },
+            {
+              "name": "sword.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F8e823fe2-1b38-4f82-968d-070c29bbf7c1-sword.png?alt=media&token=eb5eb002-c5b4-4bd0-b89e-849862f08cf5",
+              "rarity": 20
+            },
+            {
+              "name": "flail.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F87a744b6-db8f-4cd8-8b1e-961180557b24-flail.png?alt=media&token=fcd3b9ef-fcef-4480-8c65-4d67dac380b6",
+              "rarity": 20
+            },
+            {
+              "name": "spear.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fe4cce7a2-8aff-4e6a-9f8c-a313341cdbf7-spear.png?alt=media&token=75414552-6390-43d8-aa66-fd5973c998af",
+              "rarity": 20
+            },
+            {
+              "name": "axe.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fa90df309-a092-45e7-8b8b-16763bf4fc82-axe.png?alt=media&token=67f3d368-4a51-4802-a3db-3950474acdaa",
+              "rarity": 20
+            }
+          ]
+        }
+      ],
+      "layerConfigurations": [
+        {
+          "growEditionSizeTo": 100,
+          "layersOrder": [
+            { "name": "body" },
+            { "name": "head" },
+            { "name": "weapon" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kingdomly Wizards",
+      "description": "Kingdomly Wizards are the most powerful wizards in the world",
+      "quantity": 20,
+      "layers": [
+        {
+          "name": "body",
+          "attributes": [
+            {
+              "name": "red knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F99eac24b-5f7b-49e8-b12f-56a067e0169e-red%20knight.PNG?alt=media&token=93f009af-e6e1-4aba-8515-dca73288654e",
+              "rarity": 20
+            },
+            {
+              "name": "astrobody.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F8bed7d76-bf7a-4ca5-9706-a61b0ddefc6b-astrobody.PNG?alt=media&token=a59132bc-64f3-483d-aca2-ed3974973719",
+              "rarity": 20
+            },
+            {
+              "name": "silver knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F73b960b7-dc94-47b4-9274-1bfd23aa47ed-silver%20knight.PNG?alt=media&token=64106502-5dc2-489e-a4c7-009dd74d7df0",
+              "rarity": 20
+            },
+            {
+              "name": "white knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F60e6f99f-4109-4411-b45b-65c39af5693c-white%20knight.PNG?alt=media&token=7b262b3c-e869-4eb2-bc72-8d546b734973",
+              "rarity": 20
+            },
+            {
+              "name": "dark knight.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F46096649-3936-4961-b12b-8ca896e148b2-dark%20knight.PNG?alt=media&token=d77c4321-815d-413f-a315-11d561c53096",
+              "rarity": 20
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "attributes": [
+            {
+              "name": "Cowl.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F3dccd5a3-6a46-4eb9-b0ed-a16e757b0415-Cowl.PNG?alt=media&token=749289cc-1df8-4416-818f-d521f692a1fa",
+              "rarity": 20
+            },
+            {
+              "name": "astrohead.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F2425543e-f925-4c50-95c3-c1b4a82443f6-Astrohead.PNG?alt=media&token=47e0052c-07e6-43e8-9775-b80fa1acfd60",
+              "rarity": 20
+            },
+            {
+              "name": "closed helm.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F607531f7-c597-444f-a87f-94110923e5bb-Closed%20Helm.png?alt=media&token=aa78e802-5222-41bd-b583-d609f92dbaed",
+              "rarity": 20
+            },
+            {
+              "name": "cowboy.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fb9706148-02f6-4a4d-9893-82b765cd9c50-Cowboy.PNG?alt=media&token=37bd05ee-efaf-47a4-a50a-a4ed590de4bc",
+              "rarity": 20
+            },
+            {
+              "name": "open helm.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fa7f8fcf0-3dd1-46b5-ad09-9bdc96d7df28-Open%20Helm.png?alt=media&token=078ec04c-c01d-432f-b94c-3e8e175b7426",
+              "rarity": 20
+            }
+          ]
+        },
+        {
+          "name": "weapon",
+          "attributes": [
+            {
+              "name": "shield.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F523f7733-22d1-4714-915b-f9a4e42d094a-shield.png?alt=media&token=7ff9769a-3845-4330-a909-45b4097221f7",
+              "rarity": 20
+            },
+            {
+              "name": "sword.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F8e823fe2-1b38-4f82-968d-070c29bbf7c1-sword.png?alt=media&token=eb5eb002-c5b4-4bd0-b89e-849862f08cf5",
+              "rarity": 20
+            },
+            {
+              "name": "flail.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2F87a744b6-db8f-4cd8-8b1e-961180557b24-flail.png?alt=media&token=fcd3b9ef-fcef-4480-8c65-4d67dac380b6",
+              "rarity": 20
+            },
+            {
+              "name": "spear.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fe4cce7a2-8aff-4e6a-9f8c-a313341cdbf7-spear.png?alt=media&token=75414552-6390-43d8-aa66-fd5973c998af",
+              "rarity": 20
+            },
+            {
+              "name": "axe.png",
+              "url": "https://firebasestorage.googleapis.com/v0/b/kingdomlymaker-ea7a2.appspot.com/o/artworks%2Fa90df309-a092-45e7-8b8b-16763bf4fc82-axe.png?alt=media&token=67f3d368-4a51-4802-a3db-3950474acdaa",
+              "rarity": 20
+            }
+          ]
+        }
+      ],
+      "layerConfigurations": [
+        {
+          "growEditionSizeTo": 25,
+          "layersOrder": [
+            { "name": "body" },
+            { "name": "head" },
+            { "name": "weapon" }
+          ]
+        }
+      ]
+    }
+  ]
+}
