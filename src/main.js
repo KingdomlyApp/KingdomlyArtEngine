@@ -393,17 +393,11 @@ class ArtEngine {
               this.saveImage(abstractedIndexes[0]);
               this.addMetadata(newDna, abstractedIndexes[0]);
               this.saveMetaDataSingleFile(abstractedIndexes[0]);
-              console.log(
-                `Created edition: ${abstractedIndexes[0]}, with DNA: ${sha1(
-                  newDna
-                )}`
-              );
             });
             this.dnaList.add(this.filterDNAOptions(newDna));
             editionCount++;
             abstractedIndexes.shift();
-          } else {
-            console.log("DNA exists!");
+          } else { 
             failedCount++;
             if (failedCount >= this.config.uniqueDnaTorrance) {
               console.log(

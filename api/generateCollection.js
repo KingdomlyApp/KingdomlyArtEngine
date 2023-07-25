@@ -64,9 +64,6 @@ async function GenerateCollection(req, res) {
                   })
                   .pipe(file)
                   .on("finish", () => {
-                    console.log(
-                      `File downloaded successfully for layer: ${attribute.name}`
-                    );
                     file.close();
                     resolve();
                   })
@@ -108,9 +105,76 @@ async function GenerateCollection(req, res) {
     res.status(400).send({ error: error.message });
   }
 
-  //Return build files
-  res
-    .status(200)
-    .send({ status: true, message: "successfully generated build" });
+  //Step 5: Update metadata jsons with the images in the folder
+  let allMetadata = [];
+  const directory = path.join(basePath, `/build/${projectId}/json`);
+
+  fs.readdir(directory, async (err, files) => {
+    if (err) {
+      console.log("Error reading directory:", err);
+      return;
+    }
+
+    const fileProcessingPromises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        if (
+          path.extname(file) === ".json" &&
+          path.parse(file).name !== "_metadata"
+        ) {
+          const filePath = path.join(directory, file);
+          fs.readFile(filePath, "utf8", (err, data) => {
+            if (err) {
+              console.log("Error reading file:", err);
+              reject(err);
+              return;
+            }
+
+            let jsonData = JSON.parse(data);
+            jsonData.image = `https://art.kingdomly.app/build/${projectId}/images/${
+              path.parse(file).name
+            }.png`;
+            delete jsonData.edition;
+            delete jsonData.dna;
+
+            const jsonStr = JSON.stringify(jsonData, null, 2);
+            allMetadata.push(jsonData);
+
+            fs.writeFile(filePath, jsonStr, "utf8", (err) => {
+              if (err) {
+                console.log("Error writing file:", err);
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
+          });
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    await Promise.all(fileProcessingPromises);
+
+    const metadataPath = path.join(directory, "_metadata.json");
+    fs.writeFile(
+      metadataPath,
+      JSON.stringify(allMetadata, null, 2),
+      "utf8",
+      (err) => {
+        if (err) {
+          console.log("Error writing metadata file:", err);
+        }
+      }
+    );
+
+    res.status(200).send({
+      status: true,
+      message: "successfully generated build",
+      metadata: allMetadata.sort((a, b) => {
+        return parseInt(a.name.split("#")[1]) - parseInt(b.name.split("#")[1]);
+      }), //Filter allMetadata by token name number
+    });
+  });
 }
 module.exports = GenerateCollection;
