@@ -8,7 +8,7 @@ const path = require("path");
 
 async function GenerateCollection(req, res) {
   //Get the data from the request body
-  const {config,apiKey} = req.body
+  const {config} = req.body
   const {
     editions, //Array of layers object. Each layer has its name, qty, and url to that image.
     projectId, //Separator of different projects for layers and build files
@@ -30,7 +30,6 @@ async function GenerateCollection(req, res) {
     return res.status(400).send({ error: "check entered fields." });
   }
 
-  if(apiKey!=="KORKIBOOTS") {return res.status(400).send({error:"Wrong Api Key"})} ;
   //Step 1: Create unique folder from the given project id
   const directoryPath = path.join(basePath, `/layers/${projectId}/`);
   if (!fs.existsSync(directoryPath)) {
