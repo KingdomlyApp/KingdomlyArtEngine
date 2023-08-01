@@ -8,14 +8,15 @@ const path = require("path");
 
 async function GenerateCollection(req, res) {
   //Get the data from the request body
-  const {config} = req.body
   const {
     editions, //Array of layers object. Each layer has its name, qty, and url to that image.
     projectId, //Separator of different projects for layers and build files
     name, //Name of the collection
     description, //Description of the collection
     layerConfigurations, //Array of layer configurations
-  } = config;
+  } = req.body;
+  
+
   
 
   //Checks if the request body has all the required fields
@@ -24,8 +25,7 @@ async function GenerateCollection(req, res) {
     !projectId ||
     !name ||
     !description ||
-    !layerConfigurations ||
-    !apiKey
+    !layerConfigurations 
   ) {
     return res.status(400).send({ error: "check entered fields." });
   }

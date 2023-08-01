@@ -16,7 +16,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 const allowedOrigins = [
-  "http://localhost:3001",
+  "http://localhost:3000",
   "https://creator.kingdomly.app",
 ]; // Replace with your actual domain
 app.use(
