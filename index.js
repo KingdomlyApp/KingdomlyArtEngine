@@ -2,6 +2,7 @@ const express = require("express");
 const json = express.json;
 const path = require("path");
 const rateLimit = require("express-rate-limit");
+const cors = require("cors"); // Require the 'cors' package
 const Router = require("./routes.js");
 
 const app = express();
@@ -14,22 +15,23 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-const allowedOrigins = ["https://creator.kingdomly.app"];
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://creator.kingdomly.app",
+]; // Replace with your actual domain
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-
-  next();
-});
 
 // Serve static files from the "public" directory
 app.use("/build", express.static(path.join(__dirname, "build")));
