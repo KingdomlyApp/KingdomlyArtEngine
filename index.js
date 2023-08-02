@@ -15,15 +15,19 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://creator.kingdomly.app");
+  res.header("Access-Control-Allow-Origin", "https://creator.kingdomly.app/");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  app.options("*", (req, res) => {
+    // respond to OPTIONS requests
+    res.send();
+  });
+
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
   next();
 });
-
-
 
 // Serve static files from the "public" directory
 app.use("/build", express.static(path.join(__dirname, "build")));
