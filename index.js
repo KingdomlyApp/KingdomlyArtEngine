@@ -15,6 +15,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+
 const allowedOrigins = [
   "http://localhost:3000",
   "https://creator.kingdomly.app",
@@ -30,6 +31,7 @@ app.use(
     },
   })
 );
+
 
 // Serve static files from the "public" directory
 app.use("/build", express.static(path.join(__dirname, "build")));
