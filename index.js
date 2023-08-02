@@ -9,11 +9,11 @@ const app = express();
 
 app.use(json());
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 20, // limit each IP to 100 requests per windowMs
+// });
+// app.use(limiter);
 
 
 const allowedOrigins = [
