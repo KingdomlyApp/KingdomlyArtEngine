@@ -14,18 +14,20 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://creator.kingdomly.app/");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  app.options("*", (req, res) => {
-    // respond to OPTIONS requests
-    res.send();
-  });
+const allowedOrigins = ["https://creator.kingdomly.app"];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
 
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
+
   next();
 });
 
