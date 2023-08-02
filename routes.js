@@ -5,7 +5,7 @@ const GenerateCollection = require("./api/generateCollection");
 const Router = _Router();
 
 Router.get("/", async (req, res) => {
-  res.send({ status: true, message: "v2" });
+  res.send({ status: true, message: "v2.1" });
 });
 
 Router.post("/generateCollection", GenerateCollection);
