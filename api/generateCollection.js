@@ -15,9 +15,6 @@ async function GenerateCollection(req, res) {
     description, //Description of the collection
     layerConfigurations, //Array of layer configurations
   } = req.body;
-  
-
-  
 
   //Checks if the request body has all the required fields
   if (
@@ -25,7 +22,7 @@ async function GenerateCollection(req, res) {
     !projectId ||
     !name ||
     !description ||
-    !layerConfigurations 
+    !layerConfigurations
   ) {
     return res.status(400).send({ error: "check entered fields." });
   }
@@ -133,11 +130,6 @@ async function GenerateCollection(req, res) {
             }
 
             let jsonData = JSON.parse(data);
-            jsonData.image = `https://art.kingdomly.app/build/${projectId}/images/${
-              path.parse(file).name
-            }.png`;
-            delete jsonData.edition;
-            delete jsonData.dna;
 
             const jsonStr = JSON.stringify(jsonData, null, 2);
             allMetadata.push(jsonData);
@@ -158,18 +150,6 @@ async function GenerateCollection(req, res) {
     });
 
     await Promise.all(fileProcessingPromises);
-
-    const metadataPath = path.join(directory, "_metadata.json");
-    fs.writeFile(
-      metadataPath,
-      JSON.stringify(allMetadata, null, 2),
-      "utf8",
-      (err) => {
-        if (err) {
-          console.log("Error writing metadata file:", err);
-        }
-      }
-    );
 
     res.status(200).send({
       status: true,

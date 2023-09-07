@@ -15,7 +15,6 @@ app.use(json());
 // });
 // app.use(limiter);
 
-
 const allowedOrigins = [
   "http://localhost:3000",
   "https://creator.kingdomly.app",
@@ -32,7 +31,6 @@ app.use(
   })
 );
 
-
 // Serve static files from the "public" directory
 app.use("/build", express.static(path.join(__dirname, "build")));
 
@@ -42,3 +40,5 @@ app.use("/", Router);
 app.listen(PORT, () =>
   console.log(`App is now listening for requests at port ${PORT}`)
 );
+
+app.timeout = 600000;

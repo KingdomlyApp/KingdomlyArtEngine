@@ -9,6 +9,7 @@ let hashlipsGiffer = null;
 
 class ArtEngine {
   constructor({ projectId, edition, config }) {
+    this.projectId = projectId;
     this.buildDir = `${basePath}/build/${projectId}`;
     this.layersDir = `${basePath}/layers/${projectId}`;
     this.config = Object.assign(this, config);
@@ -136,7 +137,7 @@ class ArtEngine {
     let tempMetadata = {
       name: `${this.config.namePrefix} #${_edition}`,
       description: this.config.description,
-      image: `${this.config.baseUri}/${_edition}.png`,
+      image: `${this.config.baseUri}/build/${this.projectId}/images/${_edition}.png`,
       date: dateTime,
       dna: sha1(_dna),
       edition: _edition,
@@ -288,6 +289,9 @@ class ArtEngine {
     let metadata = this.metadataList.find(
       (meta) => meta.edition == _editionCount
     );
+    delete metadata.edition;
+    delete metadata.dna;
+
     this.config.debugLogs
       ? console.log(
           `Writing metadata for ${_editionCount}: ${JSON.stringify(metadata)}`
@@ -397,7 +401,7 @@ class ArtEngine {
             this.dnaList.add(this.filterDNAOptions(newDna));
             editionCount++;
             abstractedIndexes.shift();
-          } else { 
+          } else {
             failedCount++;
             if (failedCount >= this.config.uniqueDnaTorrance) {
               console.log(
