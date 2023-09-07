@@ -37,8 +37,8 @@ app.use("/build", express.static(path.join(__dirname, "build")));
 const PORT = process.env.PORT || 3001;
 app.use("/", Router);
 
+app.timeout = 600000;
+
 app.listen(PORT, () =>
   console.log(`App is now listening for requests at port ${PORT}`)
 );
-
-app.timeout = 600000;
