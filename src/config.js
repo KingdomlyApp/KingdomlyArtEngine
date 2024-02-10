@@ -26,7 +26,7 @@ class Configuration {
       //Everything below is default
       shuffleLayerConfigurations: false,
       debugLogs: false,
-      format: { width: 512, height: 512, smoothing: false },
+      format: { width: 1024, height: 1024, smoothing: false },
       gif: { export: false, repeat: 0, quality: 100, delay: 500 },
       text: {
         only: false,
@@ -53,7 +53,7 @@ class Configuration {
       preview: {
         thumbPerRow: 5,
         thumbWidth: 50,
-        imageRatio: 512 / 512,
+        imageRatio: 1024 / 1024,
         imageName: "preview.png",
       },
       preview_gif: {
