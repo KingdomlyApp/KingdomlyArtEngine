@@ -1,19 +1,12 @@
 const express = require("express");
 const json = express.json;
 const path = require("path");
-const rateLimit = require("express-rate-limit");
 const cors = require("cors"); // Require the 'cors' package
 const Router = require("./routes.js");
 
 const app = express();
 
 app.use(json());
-
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 20, // limit each IP to 100 requests per windowMs
-// });
-// app.use(limiter);
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -37,8 +30,10 @@ app.use("/build", express.static(path.join(__dirname, "build")));
 const PORT = process.env.PORT || 3001;
 app.use("/", Router);
 
-app.timeout = 1200000;
-
-app.listen(PORT, () =>
+// Listen on the specified port and then set the timeout
+const server = app.listen(PORT, () =>
   console.log(`App is now listening for requests at port ${PORT}`)
 );
+
+// Set the timeout to 1 hour (3600000 milliseconds)
+server.setTimeout(3600000);
