@@ -5,6 +5,7 @@ const basePath = process.cwd();
 const request = require("request");
 const fs = require("fs");
 const path = require("path");
+const FirebaseClass = require("../lib/FirebaseClass");
 
 async function GenerateCollection(req, res) {
   //Get the data from the request body
@@ -26,6 +27,9 @@ async function GenerateCollection(req, res) {
   ) {
     return res.status(400).send({ error: "check entered fields." });
   }
+
+  const firebaseClass = new FirebaseClass();
+  await firebaseClass?.updateIsGenerating(projectId, true);
 
   //Step 1: Create unique folder from the given project id
   const directoryPath = path.join(basePath, `/layers/${projectId}/`);
@@ -151,12 +155,19 @@ async function GenerateCollection(req, res) {
 
     await Promise.all(fileProcessingPromises);
 
+    //Step 6: Upload the metadata to Firebase
+    const { url, metadata } = await firebaseClass.updateMetadata(
+      allMetadata,
+      projectId
+    );
+
     res.status(200).send({
       status: true,
       message: "successfully generated build",
-      metadata: allMetadata.sort((a, b) => {
+      metadata: metadata.sort((a, b) => {
         return parseInt(a.name.split("#")[1]) - parseInt(b.name.split("#")[1]);
       }), //Filter allMetadata by token name number
+      metadata_file: url,
     });
   });
 }
