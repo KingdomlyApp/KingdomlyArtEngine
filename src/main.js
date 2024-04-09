@@ -7,6 +7,8 @@ const DNA_DELIMITER = "-";
 const HashlipsGiffer = require(`${basePath}/modules/HashlipsGiffer.js`);
 let hashlipsGiffer = null;
 
+const { s3UploadImage, s3UploadJson } = require("../s3Service");
+
 class ArtEngine {
   constructor({ projectId, edition, config }) {
     this.projectId = projectId;
@@ -108,10 +110,23 @@ class ArtEngine {
   };
 
   saveImage = (_editionCount) => {
-    fs.writeFileSync(
-      `${this.buildDir}/images/${_editionCount}.png`,
-      this.canvas.toBuffer("image/png")
-    );
+    // fs.writeFileSync(
+    //   `${this.buildDir}/images/${_editionCount}.png`,
+    //   this.canvas.toBuffer("image/png")
+    // );
+
+    const file = {
+      dir: `${this.projectId}`,
+      editionCount: `${_editionCount}`,
+      buffer: this.canvas.toBuffer("image/png"),
+    };
+
+    try {
+      const results = s3UploadImage(file);
+      console.log(file.editionCount);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   genColor = () => {
@@ -137,7 +152,7 @@ class ArtEngine {
     let tempMetadata = {
       name: `${this.config.namePrefix} #${_edition}`,
       description: this.config.description,
-      image: `${this.config.baseUri}/build/${this.projectId}/images/${_edition}.png`,
+      image: `${this.config.baseUri}/${this.projectId}/images/${_edition}.png`,
       date: dateTime,
       dna: sha1(_dna),
       edition: _edition,
@@ -297,10 +312,23 @@ class ArtEngine {
           `Writing metadata for ${_editionCount}: ${JSON.stringify(metadata)}`
         )
       : null;
-    fs.writeFileSync(
-      `${this.buildDir}/json/${_editionCount}.json`,
-      JSON.stringify(metadata, null, 2)
-    );
+
+    // fs.writeFileSync(
+    //   `${this.buildDir}/json/${_editionCount}.json`,
+    //   JSON.stringify(metadata, null, 2)
+    // );
+
+    const file = {
+      dir: `${this.projectId}`,
+      editionCount: `${_editionCount}`,
+      buffer: JSON.stringify(metadata, null, 2),
+    };
+
+    try {
+      const results = s3UploadJson(file);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   shuffle(array) {

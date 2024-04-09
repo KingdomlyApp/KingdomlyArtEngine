@@ -111,64 +111,100 @@ async function GenerateCollection(req, res) {
 
   //Step 5: Update metadata jsons with the images in the folder
   let allMetadata = [];
-  const directory = path.join(basePath, `/build/${projectId}/json`);
+  const directory = path.join(
+    basePath,
+    `/build/${projectId}/json/_metadata.json`
+  );
 
-  fs.readdir(directory, async (err, files) => {
-    if (err) {
-      console.log("Error reading directory:", err);
-      return;
-    }
+  let fileProcessingPromise = new Promise((resolve, reject) => {
+    fs.readFile(directory, "utf8", (err, data) => {
+      if (err) {
+        console.log("Error reading file: ", err);
+        reject(err);
+        return;
+      }
+      let jsonData = JSON.parse(data);
 
-    const fileProcessingPromises = files.map((file) => {
-      return new Promise((resolve, reject) => {
-        if (
-          path.extname(file) === ".json" &&
-          path.parse(file).name !== "_metadata"
-        ) {
-          const filePath = path.join(directory, file);
-          fs.readFile(filePath, "utf8", (err, data) => {
-            if (err) {
-              console.log("Error reading file:", err);
-              reject(err);
-              return;
-            }
-
-            let jsonData = JSON.parse(data);
-
-            const jsonStr = JSON.stringify(jsonData, null, 2);
-            allMetadata.push(jsonData);
-
-            fs.writeFile(filePath, jsonStr, "utf8", (err) => {
-              if (err) {
-                console.log("Error writing file:", err);
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          });
-        } else {
-          resolve();
-        }
-      });
-    });
-
-    await Promise.all(fileProcessingPromises);
-
-    //Step 6: Upload the metadata to Firebase
-    const { url, metadata } = await firebaseClass.updateMetadata(
-      allMetadata,
-      projectId
-    );
-
-    res.status(200).send({
-      status: true,
-      message: "successfully generated build",
-      metadata: metadata.sort((a, b) => {
-        return parseInt(a.name.split("#")[1]) - parseInt(b.name.split("#")[1]);
-      }), //Filter allMetadata by token name number
-      metadata_file: url,
+      for (let i in jsonData) {
+        allMetadata.push(jsonData[i]);
+      }
+      resolve();
     });
   });
+
+  await fileProcessingPromise;
+
+  //Step 6: Upload the metadata to Firebase
+  const { url, metadata } = await firebaseClass.updateMetadata(
+    allMetadata,
+    projectId
+  );
+
+  res.status(200).send({
+    status: true,
+    message: "successfully generated build",
+    metadata: allMetadata.sort((a, b) => {
+      return parseInt(a.name.split("#")[1]) - parseInt(b.name.split("#")[1]);
+    }), //Filter allMetadata by token name number
+    metadata_file: url,
+  });
+
+  // fs.readdir(directory, async (err, files) => {
+  //   if (err) {
+  //     console.log("Error reading directory:", err);
+  //     return;
+  //   }
+
+  //   const fileProcessingPromises = files.map((file) => {
+  //     return new Promise((resolve, reject) => {
+  //       if (
+  //         path.extname(file) === ".json" &&
+  //         path.parse(file).name !== "_metadata"
+  //       ) {
+  //         const filePath = path.join(directory, file);
+  //         fs.readFile(filePath, "utf8", (err, data) => {
+  //           if (err) {
+  //             console.log("Error reading file:", err);
+  //             reject(err);
+  //             return;
+  //           }
+
+  //           let jsonData = JSON.parse(data);
+
+  //           const jsonStr = JSON.stringify(jsonData, null, 2);
+  //           allMetadata.push(jsonData);
+
+  //           fs.writeFile(filePath, jsonStr, "utf8", (err) => {
+  //             if (err) {
+  //               console.log("Error writing file:", err);
+  //               reject(err);
+  //             } else {
+  //               resolve();
+  //             }
+  //           });
+  //         });
+  //       } else {
+  //         resolve();
+  //       }
+  //     });
+  //   });
+
+  //   await Promise.all(fileProcessingPromises);
+
+  //   //Step 6: Upload the metadata to Firebase
+  //   const { url, metadata } = await firebaseClass.updateMetadata(
+  //     allMetadata,
+  //     projectId
+  //   );
+
+  //   res.status(200).send({
+  //     status: true,
+  //     message: "successfully generated build",
+  //     metadata: allMetadata.sort((a, b) => {
+  //       return parseInt(a.name.split("#")[1]) - parseInt(b.name.split("#")[1]);
+  //     }), //Filter allMetadata by token name number
+  //     metadata_file: url,
+  //   });
+  // });
 }
 module.exports = GenerateCollection;
