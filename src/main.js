@@ -110,11 +110,6 @@ class ArtEngine {
   };
 
   saveImage = (_editionCount) => {
-    // fs.writeFileSync(
-    //   `${this.buildDir}/images/${_editionCount}.png`,
-    //   this.canvas.toBuffer("image/png")
-    // );
-
     const file = {
       dir: `${this.projectId}`,
       editionCount: `${_editionCount}`,
@@ -123,7 +118,6 @@ class ArtEngine {
 
     try {
       const results = s3UploadImage(file);
-      console.log(file.editionCount);
     } catch (err) {
       console.log(err);
     }
@@ -312,11 +306,6 @@ class ArtEngine {
           `Writing metadata for ${_editionCount}: ${JSON.stringify(metadata)}`
         )
       : null;
-
-    // fs.writeFileSync(
-    //   `${this.buildDir}/json/${_editionCount}.json`,
-    //   JSON.stringify(metadata, null, 2)
-    // );
 
     const file = {
       dir: `${this.projectId}`,
