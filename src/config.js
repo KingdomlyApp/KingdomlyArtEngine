@@ -18,7 +18,7 @@ class Configuration {
       network: "eth", // Defaulted for now
       namePrefix: this.namePrefix, // Prefix for the name of every token
       description: this.description, // Description for every token
-      baseUri: "https://art.kingdomly.app",
+      baseUri: "https://kingdomly-creator-bucket.s3.us-east-2.amazonaws.com",
       solanaMetadata: {}, // Not required atm
       layerConfigurations: this.layerConfigurations, // An array of layer configurations
       extraMetadata: this.extraMetadata, // An object of metadata that the user wants to add
