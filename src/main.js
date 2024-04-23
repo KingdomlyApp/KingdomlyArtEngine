@@ -7,7 +7,7 @@ const DNA_DELIMITER = "-";
 const HashlipsGiffer = require(`${basePath}/modules/HashlipsGiffer.js`);
 let hashlipsGiffer = null;
 
-const { s3UploadImage, s3UploadJson } = require("../s3Service");
+const s3Service = require("../s3Service");
 
 class ArtEngine {
   constructor({ projectId, edition, config }) {
@@ -117,7 +117,7 @@ class ArtEngine {
     };
 
     try {
-      const results = s3UploadImage(file);
+      const results = s3Service.s3UploadImage(file);
     } catch (err) {
       console.log(err);
     }
@@ -314,7 +314,7 @@ class ArtEngine {
     };
 
     try {
-      const results = s3UploadJson(file);
+      const results = s3Service.s3UploadJson(file);
     } catch (err) {
       console.log(err);
     }
