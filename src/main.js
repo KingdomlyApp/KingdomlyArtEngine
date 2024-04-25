@@ -24,6 +24,8 @@ class ArtEngine {
     this.metadataList = [];
     this.attributesList = [];
     this.dnaList = new Set();
+    this.imageList = [];
+    this.jsonList = [];
   }
 
   buildSetup = () => {
@@ -109,18 +111,22 @@ class ArtEngine {
     return layers;
   };
 
-  saveImage = (_editionCount) => {
-    const file = {
+  saveImage = async () => {
+    try {
+      for (const image of this.imageList) {
+        await s3Service.s3UploadImage(image);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  pushImageList = (_editionCount) => {
+    this.imageList.push({
       dir: `${this.projectId}`,
       editionCount: `${_editionCount}`,
       buffer: this.canvas.toBuffer("image/png"),
-    };
-
-    try {
-      const results = s3Service.s3UploadImage(file);
-    } catch (err) {
-      console.log(err);
-    }
+    });
   };
 
   genColor = () => {
@@ -294,7 +300,7 @@ class ArtEngine {
     fs.writeFileSync(`${this.buildDir}/json/_metadata.json`, _data);
   };
 
-  saveMetaDataSingleFile = (_editionCount) => {
+  pushJsonList = (_editionCount) => {
     let metadata = this.metadataList.find(
       (meta) => meta.edition == _editionCount
     );
@@ -307,16 +313,20 @@ class ArtEngine {
         )
       : null;
 
-    const file = {
+    this.jsonList.push({
       dir: `${this.projectId}`,
       editionCount: `${_editionCount}`,
       buffer: JSON.stringify(metadata, null, 2),
-    };
+    });
+  };
 
+  saveMetaDataSingleFile = async () => {
     try {
-      const results = s3Service.s3UploadJson(file);
-    } catch (err) {
-      console.log(err);
+      for (const json of this.jsonList) {
+        await s3Service.s3UploadJson(json);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -411,10 +421,12 @@ class ArtEngine {
               this.config.debugLogs
                 ? console.log("Editions left to create: ", abstractedIndexes)
                 : null;
-              this.saveImage(abstractedIndexes[0]);
+
+              this.pushImageList(abstractedIndexes[0]);
               this.addMetadata(newDna, abstractedIndexes[0]);
-              this.saveMetaDataSingleFile(abstractedIndexes[0]);
+              this.pushJsonList(abstractedIndexes[0]);
             });
+
             this.dnaList.add(this.filterDNAOptions(newDna));
             editionCount++;
             abstractedIndexes.shift();
@@ -432,6 +444,8 @@ class ArtEngine {
         }
         layerConfigIndex++;
       }
+      this.saveImage();
+      this.saveMetaDataSingleFile();
       this.writeMetaData(JSON.stringify(this.metadataList, null, 2));
       return "Creation successful";
     } catch (error) {
