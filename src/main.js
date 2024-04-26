@@ -312,7 +312,6 @@ class ArtEngine {
     if (this.currentJsonCount >= 250) {
       try {
         await Promise.all(this.currentJsonPromises).then(() => {
-          console.log("uploaded an json batch");
           this.currentJsonPromises = [];
           this.currentJsonCount = 0;
         });

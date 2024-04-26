@@ -49,23 +49,4 @@ exports.s3UploadJson = (file) => {
   };
 
   return s3Client.send(jsonPutObjectCommand);
-
-  // currentJsonPromises.push(s3Client.send(jsonPutObjectCommand));
-  // currentJsonCount++;
-
-  // if (currentJsonCount > 10) {
-  //   await Promise.all(currentJsonPromises).then(() => {
-  //     console.log("uploaded an json batch");
-  //     currentJsonCount = 0;
-  //   });
-  // }
-
-  // s3Client
-  //   .send(jsonPutObjectCommand)
-  //   .then(() => {
-  //     console.log("Json ", file.editionCount, " has been uploaded to s3");
-  //   })
-  //   .catch((err) => {
-  //     console.error(err);
-  //   });
 };
