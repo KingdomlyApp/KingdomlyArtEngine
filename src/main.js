@@ -116,7 +116,16 @@ class ArtEngine {
   };
 
   saveImage = async (_editionCount) => {
-    if (this.currentImageCount >= 250) {
+    const file = {
+      dir: `${this.projectId}`,
+      editionCount: `${_editionCount}`,
+      buffer: this.canvas.toBuffer("image/png"),
+    };
+
+    this.currentImagePromises.push(s3Service.s3UploadImage(file));
+    this.currentImageCount++;
+
+    if (this.currentImageCount >= 100) {
       try {
         await Promise.all(this.currentImagePromises).then(() => {
           this.currentImagePromises = [];
@@ -126,15 +135,6 @@ class ArtEngine {
         console.error(err);
       }
     }
-
-    const file = {
-      dir: `${this.projectId}`,
-      editionCount: `${_editionCount}`,
-      buffer: this.canvas.toBuffer("image/png"),
-    };
-
-    this.currentImagePromises.push(s3Service.s3UploadImage(file));
-    this.currentImageCount++;
   };
 
   genColor = () => {
@@ -288,11 +288,11 @@ class ArtEngine {
         totalWeight += element.weight;
       });
       // number between 0 - totalWeight
-      let random = Math.floor(Math.random() * totalWeight);
+      let random = (Math.random() * totalWeight).toFixed(2);
       for (var i = 0; i < layer.elements.length; i++) {
         // subtract the current weight from the random weight until we reach a sub zero value.
         random -= layer.elements[i].weight;
-        if (random < 0) {
+        if (random <= 0) {
           return randNum.push(
             `${layer.elements[i].id}:${layer.elements[i].filename}${
               layer.bypassDNA ? "?bypassDNA=true" : ""
@@ -309,17 +309,6 @@ class ArtEngine {
   };
 
   saveMetaDataSingleFile = async (_editionCount) => {
-    if (this.currentJsonCount >= 250) {
-      try {
-        await Promise.all(this.currentJsonPromises).then(() => {
-          this.currentJsonPromises = [];
-          this.currentJsonCount = 0;
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
     let metadata = this.metadataList.find(
       (meta) => meta.edition == _editionCount
     );
@@ -340,6 +329,17 @@ class ArtEngine {
 
     this.currentJsonPromises.push(s3Service.s3UploadJson(file));
     this.currentJsonCount++;
+
+    if (this.currentJsonCount >= 100) {
+      try {
+        await Promise.all(this.currentJsonPromises).then(() => {
+          this.currentJsonPromises = [];
+          this.currentJsonCount = 0;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
   shuffle(array) {
@@ -387,6 +387,7 @@ class ArtEngine {
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         ) {
           let newDna = this.createDna(layers);
+
           if (this.isDnaUnique(this.dnaList, newDna)) {
             let results = this.constructLayerToDna(newDna, layers);
             let loadedElements = [];
