@@ -291,8 +291,16 @@ class ArtEngine {
       let random = (Math.random() * totalWeight).toFixed(2);
       for (var i = 0; i < layer.elements.length; i++) {
         // subtract the current weight from the random weight until we reach a sub zero value.
+        if (i + 1 == layer.elements.length) {
+          return randNum.push(
+            `${layer.elements[i].id}:${layer.elements[i].filename}${
+              layer.bypassDNA ? "?bypassDNA=true" : ""
+            }`
+          );
+        }
+
         random -= layer.elements[i].weight;
-        if (random <= 0) {
+        if (random < 0) {
           return randNum.push(
             `${layer.elements[i].id}:${layer.elements[i].filename}${
               layer.bypassDNA ? "?bypassDNA=true" : ""
