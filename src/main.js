@@ -388,7 +388,7 @@ class ArtEngine {
     layers_copy.forEach((layer) => {
       layer.elements = layer.elements.sort((a, b) => a.weight - b.weight);
       layer.elements.forEach((element) => {
-        element.maxNum = Math.ceil(element.weight * growEditionSizeTo);
+        element.maxNum = Math.ceil((element.weight / 100) * growEditionSizeTo);
         element.currNum = 0;
       });
     });
@@ -426,8 +426,6 @@ class ArtEngine {
           layers,
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         );
-        console.log(layers[0].elements);
-        // console.log(updated_layers[0].elements);
         while (
           editionCount <=
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo

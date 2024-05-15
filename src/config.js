@@ -49,7 +49,7 @@ class Configuration {
       },
 
       rarityDelimiter: "#",
-      uniqueDnaTorrance: 10000,
+      uniqueDnaTorrance: 25000,
       preview: {
         thumbPerRow: 5,
         thumbWidth: 50,
