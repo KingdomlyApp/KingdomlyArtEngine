@@ -393,7 +393,8 @@ class ArtEngine {
     let layers_copy = _layers;
     layers_copy.forEach((layer) => {
       layer.elements = layer.elements.sort((a, b) => a.weight - b.weight);
-      layer.elements.forEach((element) => {
+      layer.elements.forEach((element, index) => {
+        element.id = index;
         element.maxNum = Math.ceil((element.weight / 100) * growEditionSizeTo);
         element.currNum = 0;
       });
