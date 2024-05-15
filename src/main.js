@@ -301,11 +301,26 @@ class ArtEngine {
 
         random -= layer.elements[i].weight;
         if (random < 0) {
-          return randNum.push(
-            `${layer.elements[i].id}:${layer.elements[i].filename}${
-              layer.bypassDNA ? "?bypassDNA=true" : ""
-            }`
-          );
+          if (layer.elements[i].currNum < layer.elements[i].maxNum) {
+            layer.elements[i].currNum++;
+            return randNum.push(
+              `${layer.elements[i].id}:${layer.elements[i].filename}${
+                layer.bypassDNA ? "?bypassDNA=true" : ""
+              }`
+            );
+          } else {
+            i++;
+            while (i < layer.elements.length) {
+              if (layer.elements[i].currNum < layer.elements[i].maxNum) {
+                layer.elements[i].currNum++;
+                return randNum.push(
+                  `${layer.elements[i].id}:${layer.elements[i].filename}${
+                    layer.bypassDNA ? "?bypassDNA=true" : ""
+                  }`
+                );
+              }
+            }
+          }
         }
       }
     });
@@ -364,6 +379,23 @@ class ArtEngine {
     return array;
   }
 
+  // arrangeLowToHigh = (_elements) => {
+  //   return _elements.sort((a, b) => a.weight - b.weight);
+  // };
+
+  getMaxElements = (_layers, growEditionSizeTo) => {
+    let layers_copy = _layers;
+    layers_copy.forEach((layer) => {
+      layer.elements = layer.elements.sort((a, b) => a.weight - b.weight);
+      layer.elements.forEach((element) => {
+        element.maxNum = Math.ceil(element.weight * growEditionSizeTo);
+        element.currNum = 0;
+      });
+    });
+
+    return _layers;
+  };
+
   startCreating = async () => {
     try {
       let layerConfigIndex = 0;
@@ -387,9 +419,15 @@ class ArtEngine {
         ? console.log("Editions left to create: ", abstractedIndexes)
         : null;
       while (layerConfigIndex < this.config.layerConfigurations.length) {
-        const layers = this.layersSetup(
+        let layers = this.layersSetup(
           this.config.layerConfigurations[layerConfigIndex]
         );
+        layers = this.getMaxElements(
+          layers,
+          this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
+        );
+        console.log(layers[0].elements);
+        // console.log(updated_layers[0].elements);
         while (
           editionCount <=
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
