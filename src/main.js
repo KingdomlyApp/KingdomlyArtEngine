@@ -319,6 +319,7 @@ class ArtEngine {
                   }`
                 );
               }
+              i++;
             }
           }
         }
