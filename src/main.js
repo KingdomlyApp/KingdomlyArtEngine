@@ -292,11 +292,16 @@ class ArtEngine {
       for (var i = 0; i < layer.elements.length; i++) {
         // subtract the current weight from the random weight until we reach a sub zero value.
         if (i + 1 == layer.elements.length) {
-          return randNum.push(
-            `${layer.elements[i].id}:${layer.elements[i].filename}${
-              layer.bypassDNA ? "?bypassDNA=true" : ""
-            }`
-          );
+          for (let k = 0; k < layer.elements.length; k++) {
+            if (layer.elements[k].currNum < layer.elements[k].maxNum) {
+              layer.elements[k].currNum++;
+              return randNum.push(
+                `${layer.elements[k].id}:${layer.elements[k].filename}${
+                  layer.bypassDNA ? "?bypassDNA=true" : ""
+                }`
+              );
+            }
+          }
         }
 
         random -= layer.elements[i].weight;
@@ -309,23 +314,18 @@ class ArtEngine {
               }`
             );
           } else {
-            i++;
-            while (i < layer.elements.length) {
-              if (layer.elements[i].currNum < layer.elements[i].maxNum) {
-                layer.elements[i].currNum++;
-                return randNum.push(
-                  `${layer.elements[i].id}:${layer.elements[i].filename}${
-                    layer.bypassDNA ? "?bypassDNA=true" : ""
-                  }`
-                );
+            for (let j = 0; j < layer.elements.length; j++) {
+              if (j != i) {
+                if (layer.elements[j].currNum < layer.elements[j].maxNum) {
+                  layer.elements[j].currNum++;
+                  return randNum.push(
+                    `${layer.elements[j].id}:${layer.elements[j].filename}${
+                      layer.bypassDNA ? "?bypassDNA=true" : ""
+                    }`
+                  );
+                }
               }
-              i++;
             }
-            return randNum.push(
-              `${layer.elements[i - 1].id}:${layer.elements[i - 1].filename}${
-                layer.bypassDNA ? "?bypassDNA=true" : ""
-              }`
-            );
           }
         }
       }
@@ -385,17 +385,13 @@ class ArtEngine {
     return array;
   }
 
-  // arrangeLowToHigh = (_elements) => {
-  //   return _elements.sort((a, b) => a.weight - b.weight);
-  // };
-
   getMaxElements = (_layers, growEditionSizeTo) => {
     let layers_copy = _layers;
     layers_copy.forEach((layer) => {
-      layer.elements = layer.elements.sort((a, b) => a.weight - b.weight);
-      layer.elements.forEach((element, index) => {
-        element.id = index;
-        element.maxNum = Math.ceil((element.weight / 100) * growEditionSizeTo);
+      layer.elements.forEach((element) => {
+        element.maxNum = Math.ceil(
+          (element.weight / 100) * growEditionSizeTo * 1.5
+        );
         element.currNum = 0;
       });
     });
