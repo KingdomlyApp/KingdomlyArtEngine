@@ -322,7 +322,7 @@ class ArtEngine {
               i++;
             }
             return randNum.push(
-              `${layer.elements[i].id}:${layer.elements[i].filename}${
+              `${layer.elements[i - 1].id}:${layer.elements[i - 1].filename}${
                 layer.bypassDNA ? "?bypassDNA=true" : ""
               }`
             );
