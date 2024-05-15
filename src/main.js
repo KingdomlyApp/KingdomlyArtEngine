@@ -321,6 +321,11 @@ class ArtEngine {
               }
               i++;
             }
+            return randNum.push(
+              `${layer.elements[i].id}:${layer.elements[i].filename}${
+                layer.bypassDNA ? "?bypassDNA=true" : ""
+              }`
+            );
           }
         }
       }
