@@ -30,6 +30,11 @@ class ArtEngine {
 
     this.currentJsonPromises = [];
     this.currentJsonCount = 0;
+
+    this.combinations = [];
+
+    this.dnaInput = [];
+    this.dnaInputTracker = [];
   }
 
   buildSetup = () => {
@@ -125,7 +130,7 @@ class ArtEngine {
     this.currentImagePromises.push(s3Service.s3UploadImage(file));
     this.currentImageCount++;
 
-    if (this.currentImageCount >= 100) {
+    if (this.currentImageCount >= 50) {
       try {
         await Promise.all(this.currentImagePromises).then(() => {
           this.currentImagePromises = [];
@@ -275,64 +280,6 @@ class ArtEngine {
     return _dna.replace(query, "");
   };
 
-  isDnaUnique = (_DnaList = new Set(), _dna = "") => {
-    const _filteredDNA = this.filterDNAOptions(_dna);
-    return !_DnaList.has(_filteredDNA);
-  };
-
-  createDna = (_layers) => {
-    let randNum = [];
-    _layers.forEach((layer) => {
-      var totalWeight = 0;
-      layer.elements.forEach((element) => {
-        totalWeight += element.weight;
-      });
-      // number between 0 - totalWeight
-      let random = (Math.random() * totalWeight).toFixed(2);
-      for (var i = 0; i < layer.elements.length; i++) {
-        // subtract the current weight from the random weight until we reach a sub zero value.
-        if (i + 1 == layer.elements.length) {
-          for (let k = 0; k < layer.elements.length; k++) {
-            if (layer.elements[k].currNum < layer.elements[k].maxNum) {
-              layer.elements[k].currNum++;
-              return randNum.push(
-                `${layer.elements[k].id}:${layer.elements[k].filename}${
-                  layer.bypassDNA ? "?bypassDNA=true" : ""
-                }`
-              );
-            }
-          }
-        }
-
-        random -= layer.elements[i].weight;
-        if (random < 0) {
-          if (layer.elements[i].currNum < layer.elements[i].maxNum) {
-            layer.elements[i].currNum++;
-            return randNum.push(
-              `${layer.elements[i].id}:${layer.elements[i].filename}${
-                layer.bypassDNA ? "?bypassDNA=true" : ""
-              }`
-            );
-          } else {
-            for (let j = 0; j < layer.elements.length; j++) {
-              if (j != i) {
-                if (layer.elements[j].currNum < layer.elements[j].maxNum) {
-                  layer.elements[j].currNum++;
-                  return randNum.push(
-                    `${layer.elements[j].id}:${layer.elements[j].filename}${
-                      layer.bypassDNA ? "?bypassDNA=true" : ""
-                    }`
-                  );
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-    return randNum.join(DNA_DELIMITER);
-  };
-
   writeMetaData = (_data) => {
     fs.writeFileSync(`${this.buildDir}/json/_metadata.json`, _data);
   };
@@ -359,7 +306,7 @@ class ArtEngine {
     this.currentJsonPromises.push(s3Service.s3UploadJson(file));
     this.currentJsonCount++;
 
-    if (this.currentJsonCount >= 100) {
+    if (this.currentJsonCount >= 50) {
       try {
         await Promise.all(this.currentJsonPromises).then(() => {
           this.currentJsonPromises = [];
@@ -388,15 +335,89 @@ class ArtEngine {
   getMaxElements = (_layers, growEditionSizeTo) => {
     let layers_copy = _layers;
     layers_copy.forEach((layer) => {
+      // layer.elements.sort((a, b) => a.weight - b.weight);
+
       layer.elements.forEach((element) => {
-        element.maxNum = Math.ceil(
-          (element.weight / 100) * growEditionSizeTo * 1.5
-        );
+        if (element.weight >= 10) {
+          element.maxNum = growEditionSizeTo;
+        } else {
+          element.maxNum = Math.ceil(
+            (element.weight / 100) * growEditionSizeTo
+          );
+        }
         element.currNum = 0;
       });
     });
 
     return _layers;
+  };
+
+  generateDnaInputArray = (_layers) => {
+    let currLayer = [];
+    let inputsTemp = [];
+
+    this.dnaInputTracker = [];
+    _layers.forEach((layer) => {
+      currLayer = [];
+      this.dnaInputTracker.push(new Array(layer.elements.length).fill(0));
+      layer.elements.forEach((element) => {
+        currLayer.push(
+          element.id + ":" + element.name + "#" + element.weight + ".png"
+        );
+      });
+      inputsTemp.push(currLayer);
+    });
+
+    this.dnaInput = inputsTemp;
+  };
+
+  parseLayer = (_layers) => {
+    return _layers.map((item) => {
+      const [index, nameWeight] = item.split(":");
+      const [name, weight] = nameWeight.split("#");
+      return {
+        index: parseInt(index),
+        name,
+        weight: parseFloat(weight),
+        original: item,
+      };
+    });
+  };
+
+  shuffleArray = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  };
+
+  weightedRandomSelect = (items) => {
+    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+    let random = Math.random() * totalWeight;
+
+    for (const item of items) {
+      if (random < item.weight) {
+        return item;
+      }
+      random -= item.weight;
+    }
+  };
+
+  generateUniqueRandomCombination = (_layers, limit) => {
+    const result = [];
+    const seen = new Set();
+
+    while (result.length < limit) {
+      const combination = _layers
+        .map((layer) => this.weightedRandomSelect(layer).original)
+        .join("-");
+      if (!seen.has(combination)) {
+        seen.add(combination);
+        result.push(combination);
+      }
+    }
+
+    return result;
   };
 
   startCreating = async () => {
@@ -429,78 +450,76 @@ class ArtEngine {
           layers,
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         );
+
+        this.generateDnaInputArray(layers);
+
+        let parsedLayers = this.dnaInput.map(this.parseLayer);
+        parsedLayers.forEach((layer) => this.shuffleArray(layer));
+        this.combinations = this.generateUniqueRandomCombination(
+          parsedLayers,
+          this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
+        );
+
         while (
           editionCount <=
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         ) {
-          let newDna = this.createDna(layers);
+          let newDna = this.combinations.shift();
 
-          if (this.isDnaUnique(this.dnaList, newDna)) {
-            let results = this.constructLayerToDna(newDna, layers);
-            let loadedElements = [];
-            results.forEach((layer) => {
-              loadedElements.push(this.loadLayerImg(layer));
-            });
+          let results = this.constructLayerToDna(newDna, layers);
+          let loadedElements = [];
+          results.forEach((layer) => {
+            loadedElements.push(this.loadLayerImg(layer));
+          });
 
-            await Promise.all(loadedElements).then((renderObjectArray) => {
-              this.config.debugLogs ? console.log("Clearing canvas") : null;
-              this.ctx.clearRect(
-                0,
-                0,
-                this.config.format.width,
-                this.config.format.height
+          await Promise.all(loadedElements).then((renderObjectArray) => {
+            this.config.debugLogs ? console.log("Clearing canvas") : null;
+            this.ctx.clearRect(
+              0,
+              0,
+              this.config.format.width,
+              this.config.format.height
+            );
+            if (this.config.gif.export) {
+              hashlipsGiffer = new HashlipsGiffer(
+                this.canvas,
+                this.ctx,
+                `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
+                this.config.gif.repeat,
+                this.config.gif.quality,
+                this.config.gif.delay
               );
-              if (this.config.gif.export) {
-                hashlipsGiffer = new HashlipsGiffer(
-                  this.canvas,
-                  this.ctx,
-                  `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
-                  this.config.gif.repeat,
-                  this.config.gif.quality,
-                  this.config.gif.delay
-                );
-                hashlipsGiffer.start();
-              }
-              if (this.config.background.generate) {
-                this.drawBackground();
-              }
-              renderObjectArray.forEach((renderObject, index) => {
-                this.drawElement(
-                  renderObject,
-                  index,
-                  this.config.layerConfigurations[layerConfigIndex].layersOrder
-                    .length
-                );
-                if (this.config.gif.export) {
-                  hashlipsGiffer.add();
-                }
-              });
-              if (this.config.gif.export) {
-                hashlipsGiffer.stop();
-              }
-              this.config.debugLogs
-                ? console.log("Editions left to create: ", abstractedIndexes)
-                : null;
-            });
-
-            await this.saveImage(abstractedIndexes[0]);
-            this.addMetadata(newDna, abstractedIndexes[0]);
-            await this.saveMetaDataSingleFile(abstractedIndexes[0]);
-
-            this.dnaList.add(this.filterDNAOptions(newDna));
-            editionCount++;
-            abstractedIndexes.shift();
-          } else {
-            failedCount++;
-            if (failedCount >= this.config.uniqueDnaTorrance) {
-              console.log(
-                `You need more layers or elements to grow your edition to ${this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
-              );
-              throw new Error(
-                `You need more layers or elements to grow your edition to ${this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
-              );
+              hashlipsGiffer.start();
             }
-          }
+            if (this.config.background.generate) {
+              this.drawBackground();
+            }
+            renderObjectArray.forEach((renderObject, index) => {
+              this.drawElement(
+                renderObject,
+                index,
+                this.config.layerConfigurations[layerConfigIndex].layersOrder
+                  .length
+              );
+              if (this.config.gif.export) {
+                hashlipsGiffer.add();
+              }
+            });
+            if (this.config.gif.export) {
+              hashlipsGiffer.stop();
+            }
+            this.config.debugLogs
+              ? console.log("Editions left to create: ", abstractedIndexes)
+              : null;
+          });
+
+          await this.saveImage(abstractedIndexes[0]);
+          this.addMetadata(newDna, abstractedIndexes[0]);
+          await this.saveMetaDataSingleFile(abstractedIndexes[0]);
+
+          this.dnaList.add(this.filterDNAOptions(newDna));
+          editionCount++;
+          abstractedIndexes.shift();
         }
         layerConfigIndex++;
       }
