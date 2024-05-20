@@ -451,77 +451,100 @@ class ArtEngine {
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         );
 
-        this.generateDnaInputArray(layers);
+        let traitCount = 0;
+        let possibleCombi = 1;
 
-        let parsedLayers = this.dnaInput.map(this.parseLayer);
-        parsedLayers.forEach((layer) => this.shuffleArray(layer));
-        this.combinations = this.generateUniqueRandomCombination(
-          parsedLayers,
-          this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
-        );
+        layers.forEach((layer) => {
+          layer.elements.forEach(() => {
+            traitCount++;
+          });
+          possibleCombi *= traitCount;
+          traitCount = 0;
+        });
 
-        while (
-          editionCount <=
+        if (
+          possibleCombi >=
           this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
         ) {
-          let newDna = this.combinations.shift();
+          this.generateDnaInputArray(layers);
 
-          let results = this.constructLayerToDna(newDna, layers);
-          let loadedElements = [];
-          results.forEach((layer) => {
-            loadedElements.push(this.loadLayerImg(layer));
-          });
+          let parsedLayers = this.dnaInput.map(this.parseLayer);
+          parsedLayers.forEach((layer) => this.shuffleArray(layer));
+          this.combinations = this.generateUniqueRandomCombination(
+            parsedLayers,
+            this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
+          );
 
-          await Promise.all(loadedElements).then((renderObjectArray) => {
-            this.config.debugLogs ? console.log("Clearing canvas") : null;
-            this.ctx.clearRect(
-              0,
-              0,
-              this.config.format.width,
-              this.config.format.height
-            );
-            if (this.config.gif.export) {
-              hashlipsGiffer = new HashlipsGiffer(
-                this.canvas,
-                this.ctx,
-                `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
-                this.config.gif.repeat,
-                this.config.gif.quality,
-                this.config.gif.delay
-              );
-              hashlipsGiffer.start();
-            }
-            if (this.config.background.generate) {
-              this.drawBackground();
-            }
-            renderObjectArray.forEach((renderObject, index) => {
-              this.drawElement(
-                renderObject,
-                index,
-                this.config.layerConfigurations[layerConfigIndex].layersOrder
-                  .length
+          while (
+            editionCount <=
+            this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo
+          ) {
+            let newDna = this.combinations.shift();
+
+            let results = this.constructLayerToDna(newDna, layers);
+            let loadedElements = [];
+            results.forEach((layer) => {
+              loadedElements.push(this.loadLayerImg(layer));
+            });
+
+            await Promise.all(loadedElements).then((renderObjectArray) => {
+              this.config.debugLogs ? console.log("Clearing canvas") : null;
+              this.ctx.clearRect(
+                0,
+                0,
+                this.config.format.width,
+                this.config.format.height
               );
               if (this.config.gif.export) {
-                hashlipsGiffer.add();
+                hashlipsGiffer = new HashlipsGiffer(
+                  this.canvas,
+                  this.ctx,
+                  `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
+                  this.config.gif.repeat,
+                  this.config.gif.quality,
+                  this.config.gif.delay
+                );
+                hashlipsGiffer.start();
               }
+              if (this.config.background.generate) {
+                this.drawBackground();
+              }
+              renderObjectArray.forEach((renderObject, index) => {
+                this.drawElement(
+                  renderObject,
+                  index,
+                  this.config.layerConfigurations[layerConfigIndex].layersOrder
+                    .length
+                );
+                if (this.config.gif.export) {
+                  hashlipsGiffer.add();
+                }
+              });
+              if (this.config.gif.export) {
+                hashlipsGiffer.stop();
+              }
+              this.config.debugLogs
+                ? console.log("Editions left to create: ", abstractedIndexes)
+                : null;
             });
-            if (this.config.gif.export) {
-              hashlipsGiffer.stop();
-            }
-            this.config.debugLogs
-              ? console.log("Editions left to create: ", abstractedIndexes)
-              : null;
-          });
 
-          await this.saveImage(abstractedIndexes[0]);
-          this.addMetadata(newDna, abstractedIndexes[0]);
-          await this.saveMetaDataSingleFile(abstractedIndexes[0]);
+            await this.saveImage(abstractedIndexes[0]);
+            this.addMetadata(newDna, abstractedIndexes[0]);
+            await this.saveMetaDataSingleFile(abstractedIndexes[0]);
 
-          this.dnaList.add(this.filterDNAOptions(newDna));
-          editionCount++;
-          abstractedIndexes.shift();
+            this.dnaList.add(this.filterDNAOptions(newDna));
+            editionCount++;
+            abstractedIndexes.shift();
+          }
+          layerConfigIndex++;
+        } else {
+          console.log(
+            `You need more layers or elements to grow your edition to ${this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
+          );
+          throw new Error(
+            `You need more layers or elements to grow your edition to ${this.config.layerConfigurations[layerConfigIndex].growEditionSizeTo} artworks!`
+          );
         }
-        layerConfigIndex++;
       }
       this.writeMetaData(JSON.stringify(this.metadataList, null, 2));
       return "Creation successful";
